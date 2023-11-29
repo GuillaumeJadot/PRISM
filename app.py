@@ -43,7 +43,7 @@ tif_filepaths = {
 
 # Load shapefile layers
 
-def load_shp(filepath, simplify_tolerance):
+def load_shp(filepath, simplify_tolerance=None):
     gdf = gpd.read_file(filepath)
     if simplify_tolerance:
         gdf['geometry'] = gdf['geometry'].simplify(simplify_tolerance)
@@ -375,7 +375,7 @@ def index():
     return render_template('index.html', map_html=map_html, analysis_results=analysis_results, error_message=error_message)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run() #debug=True)
 
 
 
