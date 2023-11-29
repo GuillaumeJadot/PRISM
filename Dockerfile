@@ -21,7 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 #EXPOSE 5000
 
 # Copy the current directory contents into the container at /usr/src/app
-COPY app.py templates .
+COPY app.py .
+COPY templates templates
 
 # Define environment variable if needed
 #ENV DATABASE_URL="your-database-url"
