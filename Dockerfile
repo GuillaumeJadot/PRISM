@@ -29,8 +29,8 @@ COPY templates templates
 #ENV API_KEY="your-api-key"
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
-
+#CMD ["python", "app.py"]
+CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0", "app:app"]
 
 #Personal
 #2. docker build -t environmental-analysis-app .

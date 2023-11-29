@@ -6,3 +6,4 @@ pyproj==3.6.1
 shapely==2.0.2
 geopy==2.4.0
 requests==2.31.0
+gunicorn
