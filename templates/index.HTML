@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Analyzer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 50px;
+        }
+
+        .custom-radio {
+            margin-bottom: 20px;
+        }
+
+        .results-section {
+            margin-top: 40px;
+        }
+
+        .loading-message {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #legend {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #999;
+            font-size: 14px;
+            line-height: 1.5;
+            z-index: 1000; /* to ensure it's on top of the map */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="mb-4">PRISM</h1>
+        <h5><b>Pollution and risks identification system for medecine</b></h5>
+
+        <form action="/" method="post" id="analysisForm">
+            <!-- Choice between adress and coord -->
+            <div class="custom-control custom-radio">
+                <input type="radio" id="address_option" name="location_type" value="address" class="custom-control-input" checked>
+                <label class="custom-control-label" for="address_option">Enter Address</label>
+            </div>
+            <div class="custom-control custom-radio">
+                <input type="radio" id="coordinates" name="location_type" value="coordinates" class="custom-control-input">
+                <label class="custom-control-label" for="coordinates">Enter Coordinates</label>
+            </div>
+
+            <!-- First, Address input -->
+            <div id="address_field" class="mt-3">
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" class="form-control" id="address" name="address">
+                </div>
+            </div>
+
+            <!-- Second, Coordinates input -->
+
+            <div id="coordinates_fields" style="display: none;" class="mt-3">
+                <div class="form-group">
+                    <label for="latitude">Latitude:</label>
+                    <input type="text" class="form-control" name="latitude" placeholder="Enter Latitude">
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude:</label>
+                    <input type="text" class="form-control" name="longitude" placeholder="Enter Longitude">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </form>
+
+        <div class="loading-message alert alert-info mt-3">
+            <p>Analysis in progress... Please wait.</p>
+        </div>
+           
+
+        {% set legend_displayed = False %}
+
+        
+    <!-- Legend for recommended limit values -->
+    <div class="result-card">
+        <h5>Limit Values proposed by the WHO for atmospheric pollutants based on annual mean values:</h5>
+        <ul>
+            <li>NO2: 25 µg/m³ (annual mean)</li>
+            <li>PM10: 15 µg/m³ (annual mean)</li>
+            <li>PM2.5: 5 µg/m³ (annual mean)</li>
+        </ul>
+    </div>
+
+    <!-- Legend to define SEVESO -->
+    <div class="result-card">
+        <h5>SEVESO sites:</h5>
+        <ul>
+            <li>La directive Seveso est le nom générique d'une série de directives européennes qui imposent aux États membres de l' Union européenne d'identifier les sites industriels présentant des risques d'accidents majeurs, appelés « sites Seveso », et d'y maintenir un haut niveau de prévention.</li>
+        </ul>
+    </div>
+
+    <!-- Legend to define dB  -->
+    <div class="result-card">
+        <h5>Decibels, fiche info:</h5>
+        <ul>
+            <li>Le murmure se situe à 20 dB(A), une conversation normale à 50 dB(A)</li>
+            <li>Les bruits gênant commencent à 85 dB(A)</li>
+            <li>Les sons fatigants (du mixer à la moto en phase d’accélération)  vont de 90 à 100 dB(A)</li>
+            <li>Les bruits gênant commencent à 85 dB(A)</li>
+            <li>Les bruits dangereux (le lecteur mp3 poussé à fond et le groupe rock en concert) vont de 105 à 110 dB(A)).</li>
+            <li>Le seuil de la douleur, enfin, débute à 115 dB(A) : bruit de métal sur l’acier, moteur de formule 1 (120 dB(A)), avion à réaction (130 dB(A)), etc.</li>
+        </ul>
+    </div>
+
+<!-- Dynamic analysis results -->
+{% for result in analysis_results %}
+    <div class="result-card">
+        {% if result['type'] == 'pollution_summary' %}
+            <button class="pollution-indicator" style="background-color: {{ result['color'] }};" onclick="togglePollutionDetails()">
+                Atmospheric Pollution
+            </button>
+            <div class="pollution-details" style="display: none;">
+                {% for detail in result['details'] %}
+                    <p style="color: {{ 'red' if detail['limit_exceeded'] else 'green' }}">
+                        {{ detail['pollutant'] }}: {{ detail['value'] }} µg/m³
+                    </p>
+                {% endfor %}
+            </div>
+        {% elif result['type'] == 'seveso' %}
+            <button class="seveso-indicator" style="background-color: {{ result['color'] }};" onclick="toggleSevesoDetails(this)">
+                SEVESO Risk Indicator
+            </button>
+            <div class="seveso-details" style="display: none;">
+                <p>{{ result['message'] }}</p>
+            </div>
+        {% elif result['type'] == 'radon' %}
+            <button class="radon-indicator" style="background-color: {{ result['color'] }};" onclick="toggleRadonDetails(this)">
+                Radon Risk Indicator
+            </button>
+            <div class="radon-details" style="display: none;">
+                <p>{{ result['message'] }}</p>
+            </div>
+        {% elif result['type'] == 'floods' %}
+            <button class="floods-indicator" style="background-color: {{ result['color'] }};" onclick="toggleFloodDetails(this)">
+                Flood Risk Indicator
+            </button>
+            <div class="floods-details" style="display: none;">
+                <p>{{ result['message'] }}</p>
+            </div>
+        {% elif result['type'] == 'inorganic_pollutants' %}
+            <button class="inorganic-indicator" style="background-color: {{ result['color'] }};" onclick="toggleInorganicDetails(this)">
+                Inorganic Pollutants
+            </button>
+            <div class="inorganic-details" style="display: none;">
+                <p>{{ result['message'] }}</p>
+            </div>
+        {% else %}
+            <h5>{{ result['message'] }}</h5>
+            {% if result['details'] %}
+                <ul>
+                {% for detail in result['details'] %}
+                    <li>{{ detail|safe }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endfor %}
+{{ map_html|safe }}
+
+<!-- Heading before the iframe -->
+<div class="container">
+
+    <h2 class="my-4">Cartes IRCeline des polluants atmosphériques en temps réels</h2>
+
+    <h4>PM10 - 24h Mean</h4>
+    <iframe height="400" width="100%" src="https://geo.irceline.be/www/pm10_24hmean_FR.html"></iframe>
+
+    <h4>PM2.5 - 24h Mean</h4>
+    <iframe height="400" width="100%" src="https://geo.irceline.be/www/pm25_24hmean_FR.html"></iframe>
+
+    <h4>O3 - Hourly Mean</h4>
+    <iframe height="400" width="100%" src="https://geo.irceline.be/www/o3_hmean_FR.html"></iframe>
+
+    <h4>NO2 - Hourly Mean</h4>
+    <iframe height="400" width="100%" src="https://geo.irceline.be/www/no2_hmean_FR.html"></iframe>
+
+    <h4>Black Carbon (BC) - 24h Mean</h4>
+    <iframe height="400" width="100%" src="https://geo.irceline.be/www/bc_24hmean_FR.html"></iframe>
+</div>
+
+<footer>
+    &copy; 2023 PRISM Analyzer. All rights reserved by ELIE UCLouvain.
+</footer>
+
+    <!-- JavaScript Imports and Functions -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        // JavaScript for form interaction and toggling details
+        document.getElementById("analysisForm").addEventListener('submit', function() {
+            document.querySelector('.loading-message').style.display = 'block';
+        });
+
+        document.querySelectorAll('[name="location_type"]').forEach(function(el) {
+            el.addEventListener('change', function() {
+                document.getElementById('coordinates_fields').style.display = this.value === 'coordinates' ? 'block' : 'none';
+                document.getElementById('address_field').style.display = this.value === 'address' ? 'block' : 'none';
+            });
+        });
+
+        function togglePollutionDetails() {
+            var details = document.querySelector('.pollution-details');
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function toggleSevesoDetails(button) {
+            var details = button.nextElementSibling;
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function toggleRadonDetails(button) {
+            var details = button.nextElementSibling;
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+ 
+        function toggleInorganicDetails(button) {
+            var details = button.nextElementSibling;
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function toggleFloodDetails(button) {
+            var details = button.nextElementSibling;
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
