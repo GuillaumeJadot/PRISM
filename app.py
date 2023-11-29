@@ -17,13 +17,14 @@ from folium.plugins import MousePosition
 from jinja2 import Template
 
 app = Flask(__name__)
-base_dir = r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables"
+#base_dir = r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables"
+base_dir = r"/srv/data/Variables"
 
 
 shp_filepaths = {
     #"Floods_25": os.path.join(base_dir,r"Risques_naturels\RISQUE_INONDATION_SHAPE_31370\RI__EMP_Q025DEB.shp"),
     #"Floods_2021": os.path.join(base_dir, r"Risques_naturels\Juillet2021_dissolve_boundaries\test_DissolveBoundaries.shp"),
-    "SEVESO": os.path.join(base_dir, r"Risques_tech\SEVESO.gpkg"),
+    "SEVESO": os.path.join(base_dir, r"Risques_tech/SEVESO.gpkg"),
     #"RADON": os.path.join(base_dir, r"Risques_tech\RADON\StatParCommune2022.shp"),
     #"Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs\Sol_pol_organiques_95centile\Sol_pol_inorganiques_95centile.shp"),
     #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs\Sol_pol_organiques_95centile\Sol_pol_organiques_95centile.shp"),
@@ -33,10 +34,10 @@ shp_filepaths = {
 }
 
 tif_filepaths = {
-    'bc': os.path.join(base_dir, r"Pollution_atm\2022\bc_anmean_2022_atmostreet_v64.tif"),
-    'no2': os.path.join(base_dir, r"Pollution_atm\2022\no2_anmean_2022_atmostreet_v64.tif"),
-    'pm10': os.path.join(base_dir, r"Pollution_atm\2022\pm10_anmean_2022_atmostreet_v64.tif"),
-    'pm25': os.path.join(base_dir, r"Pollution_atm\2022\pm25_anmean_2022_atmostreet_v64.tif")
+    'bc': os.path.join(base_dir, r"Pollution_atm/2022/bc_anmean_2022_atmostreet_v64.tif"),
+    'no2': os.path.join(base_dir, r"Pollution_atm/2022/no2_anmean_2022_atmostreet_v64.tif"),
+    'pm10': os.path.join(base_dir, r"Pollution_atm/2022/pm10_anmean_2022_atmostreet_v64.tif"),
+    'pm25': os.path.join(base_dir, r"Pollution_atm/2022/pm25_anmean_2022_atmostreet_v64.tif")
 }
 
 

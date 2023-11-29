@@ -11,14 +11,17 @@ RUN apt-get update && apt-get install -y \
     gdal-bin \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY C:/Users/Guill/Desktop/LBIRE2234_project
+# Copy python packages list to install
+COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY app.py templates .
 
 # Define environment variable if needed
 #ENV DATABASE_URL="your-database-url"
