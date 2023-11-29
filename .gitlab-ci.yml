@@ -1,0 +1,62 @@
+default:
+  tags:
+  - container
+
+stages:
+  - build
+  - deploy
+
+variables:
+  MANAGER_ID: 31
+  TARGET_APP: mediscore
+
+# from https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
+# and https://forum.gitlab.com/t/kaniko-fails-to-authenticate-to-gitlab-com-registry/45254/3
+# and https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster
+.build: &build
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.7.0-debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - export UPWD_B64=$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)
+    - export CI_REGISTRY_IMAGE_NOPORT=$(echo $CI_REGISTRY_IMAGE | sed 's#:[0-9]*##')
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$UPWD_B64\"},\"${CI_REGISTRY/:*/}\":{\"auth\":\"$UPWD_B64\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE_NOPORT:$IMAGE_NAME
+    - echo "IMAGE_REF=${CI_REGISTRY_IMAGE_NOPORT}:${IMAGE_NAME}" > deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+
+build main:
+  variables:
+    IMAGE_NAME: latest
+  <<: *build
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
+
+.update:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+  - >
+    curl --fail --request POST --form token=${CI_JOB_TOKEN} --form ref=master
+    --form "variables[IMAGE_REF]=${IMAGE_REF}"
+    --form "variables[TARGET_ENV]=${TARGET_ENV}"
+    --form "variables[TARGET_APP]=${TARGET_APP}"
+    --form "variables[COMMIT_SHA]=${CI_COMMIT_SHA}"
+    "${CI_API_V4_URL}/projects/${MANAGER_ID}/trigger/pipeline"
+  environment:
+    name: $TARGET_ENV
+
+
+update image:
+  extends: .update
+  needs: ['build main']
+  variables:
+    TARGET_ENV: production
+  rules:
+  - if: $CI_COMMIT_BRANCH == 'main'
+    when: manual
+

@@ -1,3 +1,14 @@
+## PRISM website ##
+
+This repo will generate a container including libs + code.
+
+The external data is accessible from inside this container in /srv/data.
+
+This data can be accessed and modified in /export/students/gujadot/website.
+
+
+## PRISM app (devel) ##
+
 Environmental factors Analysis Web Application
 Project Overview
 This project aims to create a web application that allows users to analyze environmental risks and pollution levels at specific locations using geospatial data. The app integrates various data layers and raster files to provide insights into flood risks, organic and inorganic pollution, and other environmental factors.
@@ -30,8 +41,8 @@ Access the web application by navigating to http://127.0.0.1:5000/ in your web b
 6.Usage
 The web interface allows you to input coordinates or an address to analyze. The results, along with an interactive map, will be displayed on the page.
 
-Authors
+## Authors ##
 Guillaume Jadot - Initial work
 
-License
+## License ##
 See the LICENSE.txt file for details.
