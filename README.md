@@ -44,5 +44,3 @@ The web interface allows you to input coordinates or an address to analyze. The 
 ## Authors ##
 Guillaume Jadot - Initial work
 
-## License ##
-See the LICENSE.txt file for details.

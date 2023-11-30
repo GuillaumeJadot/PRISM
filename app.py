@@ -21,13 +21,15 @@ app = Flask(__name__)
 base_dir = r"/srv/data/Variables"
 
 
+
+
 shp_filepaths = {
-    #"Floods_25": os.path.join(base_dir,r"Risques_naturels\RISQUE_INONDATION_SHAPE_31370\RI__EMP_Q025DEB.shp"),
-    #"Floods_2021": os.path.join(base_dir, r"Risques_naturels\Juillet2021_dissolve_boundaries\test_DissolveBoundaries.shp"),
+    "Floods_25": os.path.join(base_dir,r"Risques_naturels/RISQUE_INONDATION_SHAPE_31370/RI__EMP_Q025DEB.shp"),
+    "Floods_2021": os.path.join(base_dir, r"Risques_naturels/Juillet2021_dissolve_boundaries/test_DissolveBoundaries.shp"),
     "SEVESO": os.path.join(base_dir, r"Risques_tech/SEVESO.gpkg"),
-    #"RADON": os.path.join(base_dir, r"Risques_tech\RADON\StatParCommune2022.shp"),
-    #"Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs\Sol_pol_organiques_95centile\Sol_pol_inorganiques_95centile.shp"),
-    #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs\Sol_pol_organiques_95centile\Sol_pol_organiques_95centile.shp"),
+    "RADON": os.path.join(base_dir, r"Risques_tech/RADON/StatParCommune2022.shp"),
+    "Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_inorganiques_95centile.shp"),
+    #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_organiques_95centile.shp"),
     #"axes_routier_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série\BRUIT_AGGLO_ROAD_2012__LDEN.shp",
     #"axes_ferro_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit des axes ferroviaires dans les grandes agglomérations wallonnes - Rapportage 2012 - Série\BRUIT_AGGLO_RAIL_2012__LDEN.shp",
     #"bruits_industrie_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit de l'industrie dans les grandes agglomérations wallonnes - Rapportage 2012 – Série\BRUIT_AGGLO_IND_2012__LDEN.shp"
