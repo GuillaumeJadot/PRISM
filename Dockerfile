@@ -30,7 +30,7 @@ COPY templates templates
 
 # Run app.py when the container launches
 #CMD ["python", "app.py"]
-CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0", "app:app"]
+CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0", "-t", "120", "--keep-alive", "120", "app:app"]
 
 #Personal
 #2. docker build -t environmental-analysis-app .
