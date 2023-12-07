@@ -43,6 +43,7 @@
             line-height: 1.5;
             z-index: 1000; /* to ensure it's on top of the map */
         }
+
     </style>
 </head>
 <body>
@@ -93,88 +94,60 @@
         {% set legend_displayed = False %}
 
         
-    <!-- Legend for recommended limit values -->
-    <div class="result-card">
-        <h5>Limit Values proposed by the WHO for atmospheric pollutants based on annual mean values:</h5>
-        <ul>
-            <li>NO2: 25 µg/m³ (annual mean)</li>
-            <li>PM10: 15 µg/m³ (annual mean)</li>
-            <li>PM2.5: 5 µg/m³ (annual mean)</li>
-        </ul>
-    </div>
-
-    <!-- Legend to define SEVESO -->
-    <div class="result-card">
-        <h5>SEVESO sites:</h5>
-        <ul>
-            <li>La directive Seveso est le nom générique d'une série de directives européennes qui imposent aux États membres de l' Union européenne d'identifier les sites industriels présentant des risques d'accidents majeurs, appelés « sites Seveso », et d'y maintenir un haut niveau de prévention.</li>
-        </ul>
-    </div>
-
-    <!-- Legend to define dB  -->
-    <div class="result-card">
-        <h5>Decibels, fiche info:</h5>
-        <ul>
-            <li>Le murmure se situe à 20 dB(A), une conversation normale à 50 dB(A)</li>
-            <li>Les bruits gênant commencent à 85 dB(A)</li>
-            <li>Les sons fatigants (du mixer à la moto en phase d’accélération)  vont de 90 à 100 dB(A)</li>
-            <li>Les bruits gênant commencent à 85 dB(A)</li>
-            <li>Les bruits dangereux (le lecteur mp3 poussé à fond et le groupe rock en concert) vont de 105 à 110 dB(A)).</li>
-            <li>Le seuil de la douleur, enfin, débute à 115 dB(A) : bruit de métal sur l’acier, moteur de formule 1 (120 dB(A)), avion à réaction (130 dB(A)), etc.</li>
-        </ul>
-    </div>
-
+       
 <!-- Dynamic analysis results -->
 {% for result in analysis_results %}
-    <div class="result-card">
+<div class="result-card">
+    <div class="button-group" style="display: flex; align-items: center;">
+        <button class="{{ result['type'] }}-indicator" style="background-color: {{ result['color'] }};" onclick="toggleDetails('{{ result['type'] }}')">
+            {{ result['type'].capitalize() }} Risk Indicator
+        </button>
+        {% if result['type'] == 'pollution_summary' or result['type'] == 'seveso' or result['type']=='radon' %}
+            <button class="btn btn-info" style="margin-left: 10px;" onclick="toggleLegend('{{ result['type'] }}')">Info</button>
+        {% endif %}
+    </div>
+    <div class="{{ result['type'] }}-details" style="display: none; margin-top: 10px;">
+        <!-- Include the specific details for all layers -->
         {% if result['type'] == 'pollution_summary' %}
-            <button class="pollution-indicator" style="background-color: {{ result['color'] }};" onclick="togglePollutionDetails()">
-                Atmospheric Pollution
-            </button>
-            <div class="pollution-details" style="display: none;">
-                {% for detail in result['details'] %}
-                    <p style="color: {{ 'red' if detail['limit_exceeded'] else 'green' }}">
-                        {{ detail['pollutant'] }}: {{ detail['value'] }} µg/m³
-                    </p>
-                {% endfor %}
-            </div>
-        {% elif result['type'] == 'seveso' %}
-            <button class="seveso-indicator" style="background-color: {{ result['color'] }};" onclick="toggleSevesoDetails(this)">
-                SEVESO Risk Indicator
-            </button>
-            <div class="seveso-details" style="display: none;">
-                <p>{{ result['message'] }}</p>
-            </div>
-        {% elif result['type'] == 'radon' %}
-            <button class="radon-indicator" style="background-color: {{ result['color'] }};" onclick="toggleRadonDetails(this)">
-                Radon Risk Indicator
-            </button>
-            <div class="radon-details" style="display: none;">
-                <p>{{ result['message'] }}</p>
-            </div>
-        {% elif result['type'] == 'floods' %}
-            <button class="floods-indicator" style="background-color: {{ result['color'] }};" onclick="toggleFloodDetails(this)">
-                Flood Risk Indicator
-            </button>
-            <div class="floods-details" style="display: none;">
-                <p>{{ result['message'] }}</p>
-            </div>
-        {% elif result['type'] == 'inorganic_pollutants' %}
-            <button class="inorganic-indicator" style="background-color: {{ result['color'] }};" onclick="toggleInorganicDetails(this)">
-                Inorganic Pollutants
-            </button>
-            <div class="inorganic-details" style="display: none;">
-                <p>{{ result['message'] }}</p>
-            </div>
+            {% for detail in result['details'] %}
+                <p style="color: {{ 'red' if detail['limit_exceeded'] else 'green' }}">
+                    {{ detail['pollutant'] }}: {{ detail['value'] }} µg/m³
+                </p>
+            {% endfor %}
+            <!-- details for the rest -->
         {% else %}
-            <h5>{{ result['message'] }}</h5>
-            {% if result['details'] %}
+            <p>{{ result['message'] }}</p>
+        {% endif %}
+        <!-- Include the specific legend for the layers that needs it-->
+    </div>
+        {% if result['type'] == 'pollution_summary' %}
+            <div class="pollution_summary-legend" style="display: none;">
+                <!-- Pollution legend details -->
+                <h5>Limit Values proposed by the WHO for atmospheric pollutants based on annual mean values:</h5>
                 <ul>
-                {% for detail in result['details'] %}
-                    <li>{{ detail|safe }}</li>
-                {% endfor %}
+                    <li>NO2: 25 µg/m³ (annual mean)</li>
+                    <li>PM10: 15 µg/m³ (annual mean)</li>
+                    <li>PM2.5: 5 µg/m³ (annual mean)</li>
                 </ul>
-            {% endif %}
+            </div>
+        {% endif %}
+        {% if result['type'] == 'seveso' %}
+            <div class="seveso-legend" style="display: none;">
+                <!-- Seveso legend details -->
+                <h5>SEVESO sites:</h5>
+                <ul>
+                    <li>La directive Seveso est le nom générique d'une série de directives européennes qui imposent aux États membres de l'Union européenne d'identifier les sites industriels présentant des risques d'accidents majeurs, appelés « sites Seveso », et d'y maintenir un haut niveau de prévention.</li>
+                </ul>
+            </div>
+        {% endif %}
+        {% if result['type'] == 'radon' %}
+            <div class="radon-legend" style="display: none;">
+                <!-- Radon legend details -->
+                <h5>Risques radon:</h5>
+                <ul>
+                    <li>Selon l'OMS, toute concentration supérieur à 300 Bq/m3 est considérée comme préoccupante.</li>
+                </ul>
+            </div>
         {% endif %}
     </div>
 {% endfor %}
@@ -182,7 +155,6 @@
 
 <!-- Heading before the iframe -->
 <div class="container">
-
     <h2 class="my-4">Cartes IRCeline des polluants atmosphériques en temps réels</h2>
 
     <h4>PM10 - 24h Mean</h4>
@@ -222,51 +194,17 @@
             });
         });
 
-        function togglePollutionDetails() {
-            var details = document.querySelector('.pollution-details');
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
+        function toggleDetails(type) {
+            var details = document.querySelector('.' + type + '-details');
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
         }
 
-        function toggleSevesoDetails(button) {
-            var details = button.nextElementSibling;
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
+        function toggleLegend(type) {
+            var legend = document.querySelector('.' + type + '-legend');
+            legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
         }
 
-        function toggleRadonDetails(button) {
-            var details = button.nextElementSibling;
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
-        }
- 
-        function toggleInorganicDetails(button) {
-            var details = button.nextElementSibling;
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
-        }
 
-        function toggleFloodDetails(button) {
-            var details = button.nextElementSibling;
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
-        }
-    </script>
-
+</script>
 </body>
 </html>
