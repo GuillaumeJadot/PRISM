@@ -8,7 +8,7 @@ stages:
 
 variables:
   MANAGER_ID: 31
-  TARGET_APP: mediscore
+  TARGET_APP: prism
 
 # from https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 # and https://forum.gitlab.com/t/kaniko-fails-to-authenticate-to-gitlab-com-registry/45254/3
