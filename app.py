@@ -45,22 +45,24 @@ tif_filepaths = {
 
 
 # Load shapefile layers
+def load_shp(filepath):
+    """
+    Load a shapefile and convert its coordinate reference system to EPSG:4326.
 
-def load_shp(filepath, simplify_tolerance=None):
+    Parameters:
+    filepath (str): File path to the shapefile.
+
+    Returns:
+    geopandas.GeoDataFrame: A GeoDataFrame with the loaded shapefile data.
+    """
     gdf = gpd.read_file(filepath)
-    if simplify_tolerance:
-        gdf['geometry'] = gdf['geometry'].simplify(simplify_tolerance)
     gdf = gdf.to_crs(epsg=4326)
     return gdf
 
-floods_layers = {"Floods_25", "Floods_2021"}
 shp_layers = {}
 for name, filepath in shp_filepaths.items():
     try:
-        if name in floods_layers:
-            shp_layers[name] = load_shp(filepath, simplify_tolerance=10)
-        else:
-            shp_layers[name] = load_shp(filepath)
+        shp_layers[name] = load_shp(filepath)
     except Exception as e:
         print(f"Error loading {name} from {filepath}: {e}")
 
@@ -125,11 +127,31 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
     str: HTML representation of the map.
     """
     m = folium.Map(location=[latitude, longitude], zoom_start=zoom_start)
-    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON']  # List of layers to exclude
+
+    # Add WMS Tile
+    # Add WMS Tile Layer for Floods 2021
+    folium.raster_layers.WmsTileLayer(
+        url='http://maps.elie.ucl.ac.be/cgi-bin/mapserv72?map=/maps_server/prism/mapfiles/floods2021.map',
+        name='Floods_2021',
+        fmt='image/png',
+        layers='floods2021',
+        transparent=True
+    ).add_to(m)
+    # Add WMS Tile Layer for Floods 25
+    folium.raster_layers.WmsTileLayer(
+        url='http://maps.elie.ucl.ac.be/cgi-bin/mapserv72?map=/maps_server/prism/mapfiles/floods25.map',
+        name='Floods_25',
+        fmt='image/png',
+        layers='floods25',
+        transparent=True
+    ).add_to(m)
+
+    # GeoJSON layers
+    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021', 'Floods_25']  # List of layers to exclude
     # Create a dictionnary with the color for each .shp layer
     layer_colors = {
-    "Floods_25": "blue",
-    "Floods_2021": "darkblue", 
+    #"Floods_25": "blue",
+    #"Floods_2021": "darkblue", 
     "SEVESO": "green",
     #"Organic_Pollution": "purple",
     #"Inorganic_Pollution": "orange",
@@ -171,7 +193,7 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
     WHO_LIMITS = {'no2': 25, 'pm10': 15, 'pm25': 5}  # Define WHO limits for pollutants
 
     # Floods analysis
-    floods_layers = {'Floods_25': 'flooding with a return period of 25 years', 'Floods_2021': 'floods of July 2021'}
+    floods_layers = {'Floods_25': 'inondations avec une période de retour de 25 ans', 'Floods_2021': 'inondations de juillet 2021'}
     floods_intersects = []
     for layer_name, description in floods_layers.items():
         if layer_name in shp_layers:
@@ -181,10 +203,10 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
 
     if floods_intersects:
         floods_color = 'red'
-        floods_message = 'The address is at risk of ' + ' and '.join(floods_intersects)
+        floods_message = 'La localisation est dans une zone à risques pour les ' + ' et les '.join(floods_intersects)
     else:
         floods_color = 'green'
-        floods_message = 'Location is not at risk of flooding'
+        floods_message = 'La localisation n\'est pas dans une zone à risque d\'inondations.'
 
     analysis_results.append({
         'type': 'floods',
@@ -200,10 +222,10 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
         if not seveso_matches.empty:
             seveso_color = 'red'
             seveso_name = seveso_matches.iloc[0]['SOC_NOM']  # Extract the SOC_NOM value
-            seveso_message = f"Location intersects with SEVESO site: {seveso_name}."
+            seveso_message = f"La localisation se trouve dans la zone SEVESO de l'entreprise: {seveso_name}."
         else:
             seveso_color = 'green'
-            seveso_message = "Location is not in a SEVESO risk zone."
+            seveso_message = "La localisation n'est pas dans une zone SEVESO."
 
         analysis_results.append({
             'type': 'seveso',
@@ -236,22 +258,22 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
             analysis_results.append({
                 'type': 'radon',
                 'color': radon_color,
-                'message': f"Radon Risk Class: {radon_class} - {radon_detail}"
+                'message': f"Risque radon : {radon_class} - {radon_detail}"
             })
         else:
             analysis_results.append({
                 'type': 'radon',
-                'message': 'No radon data available for this location.'
+                'message': 'Pas de données disponibles pour le radon à cette localisation.'
             })
 
     # Inorganic Pollutants analysis
     inorganic_pollutants = {
-        'As': 40,   # Arsenic threshold in mg/kg
-        'Cd': 32.52,  # Cadmium threshold
+        'As': 30,   # Arsenic threshold in mg/kg
+        'Cd': 10.85,  # Cadmium threshold
         'Mn': 585,   # Manganese threshold
         'Mo': 13,   # Molybdenum threshold
         'Pb': 200,   # Lead (Plomb) threshold
-        'Zn': 522   # Zinc threshold
+        'Zn': 259   # Zinc threshold
     }
 
     inorganic_pollutants_exceeds = []
@@ -272,10 +294,10 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
 
     if inorganic_pollutants_exceeds:
         inorganic_color = 'red'
-        inorganic_message = 'Exceeds thresholds for: ' + ', '.join(inorganic_pollutants_exceeds)
+        inorganic_message = 'Seuil dépassé pour : ' + ', '.join(inorganic_pollutants_exceeds)
     else:
         inorganic_color = 'green'
-        inorganic_message = 'No inorganic pollutant thresholds exceeded'
+        inorganic_message = 'Aucun seuil de polluants inorganiques dépassé'
 
     analysis_results.append({
         'type': 'inorganic_pollutants',
