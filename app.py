@@ -93,7 +93,6 @@ def sample_tif_value(tif_filepath, longitude, latitude):
         return f"An error occurred while sampling the raster file: {e}"
 
 
-
 # check_risk function 
 def check_shapefile_risk(layer, longitude, latitude, buffer_size=10): # lower buffer_size reduces the number of features checked during spatial query
     point = Point(longitude, latitude)
