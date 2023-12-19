@@ -17,11 +17,9 @@ from folium.plugins import MousePosition
 from jinja2 import Template
 
 app = Flask(__name__)
-#base_dir = r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables"
+#base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
 base_dir = r"/srv/data/Variables"
 #base_dir = r"/export/homes/students/gujadot/website/Variables"
-
-
 
 
 shp_filepaths = {
@@ -31,9 +29,12 @@ shp_filepaths = {
     "RADON": os.path.join(base_dir, r"Risques_tech/RADON/StatParCommune2022.shp"),
     "Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_inorganiques_95centile.shp"),
     #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_organiques_95centile.shp"),
-    #"axes_routier_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série\BRUIT_AGGLO_ROAD_2012__LDEN.shp",
-    #"axes_ferro_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit des axes ferroviaires dans les grandes agglomérations wallonnes - Rapportage 2012 - Série\BRUIT_AGGLO_RAIL_2012__LDEN.shp",
-    #"bruits_industrie_agglo": r"C:\Users\Guill\OneDrive - UCL\University\Master2\LBIRE2234\Variables\Pollution_sonore\Bruit de l'industrie dans les grandes agglomérations wallonnes - Rapportage 2012 – Série\BRUIT_AGGLO_IND_2012__LDEN.shp"
+    "Pollution_sonore_route": os.path.join(base_dir, "Pollution_sonore/BRUIT_MROAD_2017_SHAPE_31370/BRUIT_MROAD_2017__LDEN.shp"),
+    "Pollution_sonore_ferroviaire": os.path.join(base_dir, r"Pollution_sonore/BRUIT_MRAIL_2017_SHAPE_31370/BRUIT_MRAIL_2017__LDEN.shp"),
+    "Pollution_sonore_airport": os.path.join(base_dir, "Pollution_sonore/BRUIT_AEROPORT_SHAPE_31370/BRUIT_AEROPORT_PEB.shp"),
+    #"axes_routier_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_ROAD_2012__LDEN.shp",
+    #"axes_ferro_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit des axes ferroviaires dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_RAIL_2012__LDEN.shp",
+    #"bruits_industrie_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit de l'industrie dans les grandes agglomérations wallonnes - Rapportage 2012 – Série/BRUIT_AGGLO_IND_2012__LDEN.shp"
 }
 
 tif_filepaths = {
@@ -42,7 +43,6 @@ tif_filepaths = {
     'pm10': os.path.join(base_dir, r"Pollution_atm/2022/pm10_anmean_2022_atmostreet_v64.tif"),
     'pm25': os.path.join(base_dir, r"Pollution_atm/2022/pm25_anmean_2022_atmostreet_v64.tif")
 }
-
 
 # Load shapefile layers
 def load_shp(filepath):
@@ -66,8 +66,6 @@ for name, filepath in shp_filepaths.items():
     except Exception as e:
         print(f"Error loading {name} from {filepath}: {e}")
 
-
-
 # Sample value from raster
 def sample_tif_value(tif_filepath, longitude, latitude):
     try:
@@ -75,18 +73,14 @@ def sample_tif_value(tif_filepath, longitude, latitude):
             # Create a transformer to convert from WGS 84 to the raster's CRS
             transformer = Transformer.from_crs(4326, src.crs, always_xy=True)
             x, y = transformer.transform(longitude, latitude)
-            
             # Sample the raster at the transformed coordinates
             sampled_values = src.sample([(x, y)])
             sample = next(sampled_values)  # Get the next (and hopefully only) sample
-            
             # Debugging: print the sample to see what we got
             print(f"Sample: {sample}")
-            
             # If it's a single float value, return it directly
             if isinstance(sample, float):
                 return f"Sampled Value: {sample}"
-            
             # Otherwise, attempt to extract the value from the array or list
             value = sample[0]
             
@@ -147,12 +141,13 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
     ).add_to(m)
 
     # GeoJSON layers
-    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021', 'Floods_25']  # List of layers to exclude
+    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021','Floods_25', "Pollution_sonore_route", "Pollution_sonore_ferroviaire"]  # List of layers to exclude
     # Create a dictionnary with the color for each .shp layer
     layer_colors = {
-    #"Floods_25": "blue",
-    #"Floods_2021": "darkblue", 
+    "Floods_25": "blue",
+    "Floods_2021": "darkblue", 
     "SEVESO": "green",
+    "Pollution_sonore_airport": "gray",
     #"Organic_Pollution": "purple",
     #"Inorganic_Pollution": "orange",
     #"axes_routier_agglo": "darkred",
@@ -175,9 +170,19 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
                 bottom: 50px; left: 50px; width: auto; height: auto; 
                 border:2px solid grey; z-index:9999; font-size:14px;
                 background-color:white; padding:5px; overflow: auto;">
-                <h4>Legend</h4>'''
-    for layer_name, color in layer_colors.items():
-        legend_html += f'<div><span style="background:{color}; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></span>{layer_name}</div>'
+                <h4>Légende</h4>'''
+
+    legend_labels = {
+    "Floods_25": "Inondations retour 25 ans",
+    "Floods_2021": "Inondations de 2021",
+    "SEVESO": "SEVESO",
+    "Pollution_sonore_airport": "Bruit aéroports",
+    }
+
+    for layer_name, label in legend_labels.items():
+        color = layer_colors.get(layer_name, "gray")  # Get the color for the layer
+        legend_html += f'<div><span style="background:{color}; width: 12px; height: 12px; display: inline-block; margin-right: 5px;"></span>{label}</div>'
+    
     legend_html += '</div>'
 
     m.get_root().html.add_child(folium.Element(legend_html))
@@ -232,7 +237,6 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
             'color': seveso_color,
             'message': seveso_message
         })
-
 
     # RADON analysis
     radon_layer = shp_layers.get("RADON")
@@ -289,7 +293,7 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
                     if value > threshold:
                         inorganic_pollutants_exceeds.append(f"{pollutant}: {value} mg/kg")
                 except ValueError:
-                    # Handle the case where value_str cannot be converted to float
+                    # if value_str cannot be converted to float
                     print(f"Error converting {pollutant} value to float: {value_str}")
 
     if inorganic_pollutants_exceeds:
@@ -305,6 +309,87 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
         'message': inorganic_message,
         'details': inorganic_pollutants_exceeds
     })
+
+    # Pollution Sonore Route analysis
+    # Determine the color based on the classe
+    sonor_color = {
+        'moins de 55': 'lightgreen',
+        'de 55 à 59': 'green',
+        'de 60 à 64': 'yellow',
+        'de 65 à 69': 'orange',
+        'de 70 à 74': 'red',
+        'plus de 75': 'purple',
+    }
+    pollution_sonore_route_layer = shp_layers.get("Pollution_sonore_route")
+    if pollution_sonore_route_layer is not None:
+        sonore_route_match = check_shapefile_risk(pollution_sonore_route_layer, longitude, latitude)
+        if not sonore_route_match.empty:
+            classe_route = sonore_route_match.iloc[0]['CLASSE']
+            sonore_route_color = sonor_color.get(classe_route, 'grey')
+            sonore_route_message = f"Niveau de bruit routier en dB : {classe_route}"
+            analysis_results.append({
+                'type': 'pollution_sonore_route',
+                'color': sonore_route_color,
+                'message': sonore_route_message
+            })
+        else:
+            analysis_results.append({
+                'type': 'pollution_sonore_route',
+                'color': 'green',
+                'message': 'Il n\'a y pas de pollution sonore liée aux grands axes routiers pour cette localisation'
+            })
+
+    # Pollution Sonore Ferroviaire analysis
+    pollution_sonore_ferroviaire_layer = shp_layers.get("Pollution_sonore_ferroviaire")
+    if pollution_sonore_ferroviaire_layer is not None:
+        sonore_ferroviaire_match = check_shapefile_risk(pollution_sonore_ferroviaire_layer, longitude, latitude)
+        if not sonore_ferroviaire_match.empty:
+            classe_ferroviaire = sonore_ferroviaire_match.iloc[0]['CLASSE']
+            sonore_ferroviaire_color = sonor_color.get(classe_ferroviaire, 'grey')
+            sonore_ferroviaire_message = f"Niveau de bruit ferroviaire en dB : {classe_ferroviaire}"
+            analysis_results.append({
+                'type': 'pollution_sonore_ferroviaire',
+                'color': sonore_ferroviaire_color,
+                'message': sonore_ferroviaire_message
+            })
+        else:
+            analysis_results.append({
+                'type': 'pollution_sonore_ferroviaire',
+                'color': 'green',
+                'message': 'Il n\'a y pas de pollution sonore liée aux grand axes ferroviaires pour cette localisation'
+            })
+
+    # Pollution Sonore airport analysis
+    pollution_sonore_airport_layer = shp_layers.get("Pollution_sonore_airport")
+    airport_color = {
+        "Zone A'": 'red',
+        "Zone B'": 'orange',
+        "Zone C'": 'yellow',
+        "Zone D'": 'green',
+    }
+    if pollution_sonore_airport_layer is not None:
+        sonore_airport_match = check_shapefile_risk(pollution_sonore_airport_layer, longitude, latitude)
+        if not sonore_airport_match.empty:
+            classe_airport = sonore_airport_match.iloc[0]['ZONAGE']
+            sonore_airport_color = airport_color.get(classe_airport, 'grey')
+            airport_detail = {
+                "Zone A'": '70 dB',
+                "Zone B'": 'entre 70 et 65 dB',
+                "Zone C'": 'entre 65 et 60 dB',
+                "Zone D'": 'entre 60 et 55 dB',
+            }.get(classe_airport, 'No data')
+            sonore_airport_message = f"Niveau de bruit airport en dB : {classe_airport} - {airport_detail}"
+            analysis_results.append({
+                'type': 'pollution_sonore_airport',
+                'color': sonore_airport_color,
+                'message': sonore_airport_message
+            })
+        else:
+            analysis_results.append({
+                'type': 'pollution_sonore_airport',
+                'color': 'green',
+                'message': 'Il n\'a y pas de pollution sonore liée aux aéroports pour cette localisation'
+            })
 
     # atmospheric pollutants
     pollution_exceeds = 0
@@ -325,7 +410,7 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
                 'limit_exceeded': exceeds_limit
             })
         except (IndexError, ValueError):
-            # Handle error in sampling value
+            # Handle error
             pollution_details.append({
                 'pollutant': name.upper(),
                 'message': message

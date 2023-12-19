@@ -102,7 +102,7 @@
         <button class="{{ result['type'] }}-indicator" style="background-color: {{ result['color'] }};" onclick="toggleDetails('{{ result['type'] }}')">
             {{ result['type'].capitalize() }} Risk Indicator
         </button>
-        {% if result['type'] == 'pollution_summary' or result['type'] == 'seveso' or result['type']=='radon' %}
+        {% if result['type'] in ['pollution_summary', 'seveso', 'radon', 'floods', 'inorganic_pollutants'] %}
             <button class="btn btn-info" style="margin-left: 10px;" onclick="toggleLegend('{{ result['type'] }}')">Info</button>
         {% endif %}
     </div>
@@ -118,34 +118,61 @@
         {% else %}
             <p>{{ result['message'] }}</p>
         {% endif %}
-        <!-- Include the specific legend for the layers that needs it-->
     </div>
+        <!-- Information Button Content -->
         {% if result['type'] == 'pollution_summary' %}
             <div class="pollution_summary-legend" style="display: none;">
-                <!-- Pollution legend details -->
-                <h5>Valeurs limites proposées par l'OMS pour les polluants atmosphériques sur la base de valeurs moyennes annuelles:</h5>
+                <h5>Valeurs limites proposées par l'OMS pour les polluants atmosphériques basées sur des valeurs moyennes annuelles :</h5>
                 <ul>
                     <li>NO2: 25 µg/m³</li>
                     <li>PM10: 15 µg/m³</li>
                     <li>PM2.5: 5 µg/m³</li>
                 </ul>
+                <p>La pollution de l'air est principalement associée à des maladies cardio-respiratoires, cérébro-vasculaires et à certains types de cancers.</p>
+                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
             </div>
         {% endif %}
         {% if result['type'] == 'seveso' %}
             <div class="seveso-legend" style="display: none;">
-                <!-- Seveso legend details -->
-                <h5>SEVESO sites:</h5>
-                <ul>
-                    <li>La directive Seveso est le nom générique d'une série de directives européennes qui imposent aux États membres de l'Union européenne d'identifier les sites industriels présentant des risques d'accidents majeurs, appelés « sites Seveso », et d'y maintenir un haut niveau de prévention.</li>
-                </ul>
+                <h5>Sites SEVESO :</h5>
+                <p>Les sites Seveso sont des zones où des incidents éventuels peuvent survenir, engendrant des conséquences possibles pour le personnel, les populations environnantes, les biens ou l'environnement. Les territoires sont exposés à divers risques naturels tels que la submersion marine, les ruissellements, les pluies diluviennes, l'érosion du littoral, les mouvements de terrain, etc.</p>
+                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
             </div>
         {% endif %}
         {% if result['type'] == 'radon' %}
             <div class="radon-legend" style="display: none;">
-                <!-- Radon legend details -->
                 <h5>Risques radon:</h5>
+                <p>Le radon, considéré comme un agent carcinogène, constitue la deuxième cause de cancer du poumon après le tabagisme. En fonction des données scientifiques les plus récentes, l'OMS propose un niveau de référence de 100 Bq/m3 afin de minimiser les risques pour la santé liés à l'exposition au radon à l'intérieur des habitations. Cependant, si ce niveau ne peut pas être atteint dans les conditions spécifiques à chaque pays, le niveau de référence choisi ne devrait pas dépasser 300 Bq/m3.</p>
+                <p>Source : Angell, W. J., Zeeb, H., & Shannon, F. (2009). <em>Handbook on Indoor Radon : A Public Health Perspective</em>. WHO Library Cataloguing-in-Publication Data. <a href="https://iris.who.int/bitstream/handle/10665/44149/9789241547673_eng.pdf;jsessionid=D026AA0F9089BF3A94F8CC90D9B53979?sequence=1">Link to source</a></p>
+            </div>
+        {% endif %}
+        {% if result['type'] == 'floods' %}
+            <div class="floods-legend" style="display: none;">
+                <h5>Risques des inondations:</h5>
+                <p>En plus des éventuels décès, les inondations peuvent entraîner des conséquences telles que des infections gastro-intestinales, cutanées et des infections des voies respiratoires supérieures, provoquées par le développement de moisissures consécutif aux inondations. Elles peuvent également être à l'origine de troubles tels que le stress post-traumatique et de troubles dépressifs majeurs.</p>
+                <p>Source: Carias M. E., Johnston D. W., Knott R., and al (2022). <a href="https://doi.org/10.1002/hec.4566">Flood disasters and health among the urban poor. Health Economics, 31(9), 2072-2089.</a></p>
+            </div>
+        {% endif %}
+        {% if result['type'] == 'inorganic_pollutants' %}
+            <div class="inorganic_pollutants-legend" style="display: none;">
+                <h5>Risques des Polluants Inorganiques:</h5>
                 <ul>
-                    <li>Selon l'OMS, toute concentration supérieur à 300 Bq/m3 est considérée comme préoccupante.</li>
+                    <li>Exposition prolongée au cadmium (Cd): déminéralisation osseuse, affections osseuses et rénales, troubles respiratoires, neurotoxicité, potentiel cancérigène, risque accru de diabète de type 2.</li>
+                    <li>Exposition prolongée au mercure (Hg): neurotoxicité, tremblements mercuriels, gingivite, hypersialorrhée, changements de comportement, perte de mémoire, insomnie, dépression, hallucinations.</li>
+                    <li>Exposition prolongée au plomb (Pb): anémie hémolytique, neurotoxicité, infertilité, déficience vitamine D, augmentation du risque cardiovasculaire.</li>
+                    <li>Exposition prolongée au chrome (Cr): néphrotoxicité, potentiel cancérigène, corrosions gastro-intestinales.</li>
+                    <li>Exposition prolongée au cuivre (Cu): toxicité hépatique.</li>
+                    <li>Exposition prolongée au zinc (Zn): carence en cuivre, anémie, neutropénie, altération de la fonction immunitaire, perturbation du profil lipidique.</li>
+                    <li>Exposition prolongée au nickel (Ni): troubles respiratoires et rénaux, neurotoxicité, allergie de contact, potentiel cancérigène, lésions hépatiques.</li>
+                </ul>
+                <p>Sources:</p>
+                <ul>
+                    <li><a href="https://doi.org/10.1002/jcb.26234">Rehman et al. (2017), Journal of Cellular Biochemistry</a></li>
+                    <li><a href="https://doi.org/10.1155/2012/460508">Bernhoft (2012), Journal of Environmental and Public Health</a></li>
+                    <li><a href="https://doi.org/10.1016/0048-9697(89)90201-5">Gad (1989), Science of The Total Environment</a></li>
+                    <li><a href="https://doi.org/10.1007/s00267-019-01234-y">Taylor et al. (2019), Environmental Management</a></li>
+                    <li><a href="https://doi.org/10.1093/ajcn/51.2.225">Fosmire (1990), The American Journal of Clinical Nutrition</a></li>
+                    <li><a href="https://www.alcor-controles.fr/diagnostic-pollution-des-sols-les-principaux-polluants/#les-polluants-composes-inorganique">Alcor Controles</a></li>
                 </ul>
             </div>
         {% endif %}
@@ -156,6 +183,7 @@
 <!-- Heading before the iframe -->
 <div class="container">
     <h2 class="my-4">Cartes IRCeline des polluants atmosphériques en temps réels</h2>
+    <p class="mt-3">Source : <a href="https://www.irceline.be/fr">Cellule Interrégionale de l'Environnement (CELINE)</a></p>
 
     <h4>PM10 - 24h Mean</h4>
     <iframe height="400" width="100%" src="https://geo.irceline.be/www/pm10_24hmean_FR.html"></iframe>
