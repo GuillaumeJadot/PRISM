@@ -102,7 +102,7 @@
         <button class="{{ result['type'] }}-indicator" style="background-color: {{ result['color'] }};" onclick="toggleDetails('{{ result['type'] }}')">
             {{ result['type'].capitalize() }} Risk Indicator
         </button>
-        {% if result['type'] in ['pollution_summary', 'seveso', 'radon', 'floods', 'inorganic_pollutants'] %}
+        {% if result['type'] in ['pollution_summary', 'seveso', 'radon', 'floods', 'inorganic_pollutants', 'pollution_sonore_route'] %}
             <button class="btn btn-info" style="margin-left: 10px;" onclick="toggleLegend('{{ result['type'] }}')">Info</button>
         {% endif %}
     </div>
@@ -139,6 +139,13 @@
                 <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
             </div>
         {% endif %}
+        {% if result['type'] == 'pollution_sonore_route' %}
+        <div class="pollution_sonore_route-legend" style="display: none;">
+            <h5>Risques liées à la pollution sonore :</h5>
+            <p>Le bruit peut perturber les activités quotidiennes et avoir des répercussions sur la santé, se manifestant par des problèmes auditifs tels que les acouphènes, une qualité de sommeil altérée, des événements cardiovasculaires, des déficits cognitifs et d'autres conséquences métaboliques touchant, par exemple, le système immunitaire, endocrinien, ou la santé mentale. </p>
+            <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
+        </div>
+    {% endif %}
         {% if result['type'] == 'radon' %}
             <div class="radon-legend" style="display: none;">
                 <h5>Risques radon:</h5>

@@ -17,8 +17,8 @@ from folium.plugins import MousePosition
 from jinja2 import Template
 
 app = Flask(__name__)
-#base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
-base_dir = r"/srv/data/Variables"
+base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
+#base_dir = r"/srv/data/Variables"
 #base_dir = r"/export/homes/students/gujadot/website/Variables"
 
 
@@ -41,7 +41,7 @@ tif_filepaths = {
     'bc': os.path.join(base_dir, r"Pollution_atm/2022/bc_anmean_2022_atmostreet_v64.tif"),
     'no2': os.path.join(base_dir, r"Pollution_atm/2022/no2_anmean_2022_atmostreet_v64.tif"),
     'pm10': os.path.join(base_dir, r"Pollution_atm/2022/pm10_anmean_2022_atmostreet_v64.tif"),
-    'pm25': os.path.join(base_dir, r"Pollution_atm/2022/pm25_anmean_2022_atmostreet_v64.tif")
+    'pm2.5': os.path.join(base_dir, r"Pollution_atm/2022/pm25_anmean_2022_atmostreet_v64.tif")
 }
 
 # Load shapefile layers
@@ -194,7 +194,7 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
 # Main function
 def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
     analysis_results = []
-    WHO_LIMITS = {'no2': 25, 'pm10': 15, 'pm25': 5}  # Define WHO limits for pollutants
+    WHO_LIMITS = {'no2': 25, 'pm10': 15, 'pm2.5': 5}  # Define WHO limits for pollutants
 
     # Floods analysis
     floods_layers = {'Floods_25': 'inondations avec une période de retour de 25 ans', 'Floods_2021': 'inondations de juillet 2021'}
