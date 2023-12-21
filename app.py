@@ -17,8 +17,8 @@ from folium.plugins import MousePosition
 from jinja2 import Template
 
 app = Flask(__name__)
-base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
-#base_dir = r"/srv/data/Variables"
+#base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
+base_dir = r"/srv/data/Variables"
 #base_dir = r"/export/homes/students/gujadot/website/Variables"
 
 
