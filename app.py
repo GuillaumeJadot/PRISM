@@ -20,6 +20,7 @@ app = Flask(__name__)
 #base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
 base_dir = r"/srv/data/Variables"
 #base_dir = r"/export/homes/students/gujadot/website/Variables"
+base_dir = "/Users/guillaumejadot/Library/CloudStorage/OneDrive-UCL/University/Master2/Q1/LBIRE2234/Variables"
 
 
 shp_filepaths = {
@@ -425,7 +426,7 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
         color = "red"
     # Add a summary result for pollution
     analysis_results.append({
-        'type': 'pollution_summary',
+        'type': 'Air_quality',
         'color': color,
         'details': pollution_details
     })
