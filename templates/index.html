@@ -50,7 +50,7 @@
 
     <div class="container">
         <h1 class="mb-4">PRISM</h1>
-        <h5><b>Pollution and risks identification system for medecine</b></h5>
+        <h5><b>Pollution and risks identification system for medicine</b></h5>
 
         <form action="/" method="post" id="analysisForm">
             <!-- Choice between adress and coord -->
@@ -102,13 +102,13 @@
         <button class="{{ result['type'] }}-indicator" style="background-color: {{ result['color'] }};" onclick="toggleDetails('{{ result['type'] }}')">
             {{ result['type'].capitalize() }} Risk Indicator
         </button>
-        {% if result['type'] in ['pollution_summary', 'seveso', 'radon', 'floods', 'inorganic_pollutants', 'pollution_sonore_route'] %}
+        {% if result['type'] in ['Air_quality', 'seveso', 'radon', 'floods', 'inorganic_pollutants', 'pollution_sonore_route'] %}
             <button class="btn btn-info" style="margin-left: 10px;" onclick="toggleLegend('{{ result['type'] }}')">Info</button>
         {% endif %}
     </div>
     <div class="{{ result['type'] }}-details" style="display: none; margin-top: 10px;">
         <!-- Include the specific details for all layers -->
-        {% if result['type'] == 'pollution_summary' %}
+        {% if result['type'] == 'Air_quality' %}
             {% for detail in result['details'] %}
                 <p style="color: {{ 'red' if detail['limit_exceeded'] else 'green' }}">
                     {{ detail['pollutant'] }}: {{ detail['value'] }} µg/m³
@@ -120,8 +120,8 @@
         {% endif %}
     </div>
         <!-- Information Button Content -->
-        {% if result['type'] == 'pollution_summary' %}
-            <div class="pollution_summary-legend" style="display: none;">
+        {% if result['type'] == 'Air_quality' %}
+            <div class="Air_quality-legend" style="display: none;">
                 <h5>Valeurs limites proposées par l'OMS pour les polluants atmosphériques basées sur des valeurs moyennes annuelles :</h5>
                 <ul>
                     <li>NO2: 25 µg/m³</li>
