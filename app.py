@@ -20,20 +20,24 @@ app = Flask(__name__)
 #base_dir = r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables"
 base_dir = r"/srv/data/Variables"
 #base_dir = r"/export/homes/students/gujadot/website/Variables"
-#base_dir = "/Users/guillaumejadot/Library/CloudStorage/OneDrive-UCL/University/Master2/Q1/LBIRE2234/Variables"
+# base_dir = "/Users/guillaumejadot/Library/CloudStorage/OneDrive-UCL/University/Master2/Q1/LBIRE2234/Variables/"
 
+# wallon_layer = os.path.join(base_dir, r"Wallonie.shp")
 
 shp_filepaths = {
+    "wallon": os.path.join(base_dir, r"Wallonie/Region_wallonne.shp"),
     "Floods_25": os.path.join(base_dir,r"Risques_naturels/RISQUE_INONDATION_SHAPE_31370/RI__EMP_Q025DEB.shp"),
     "Floods_2021": os.path.join(base_dir, r"Risques_naturels/Juillet2021_dissolve_boundaries/test_DissolveBoundaries.shp"),
-    "SEVESO": os.path.join(base_dir, r"Risques_tech/SEVESO.gpkg"),
+    # "SEVESO": os.path.join(base_dir, r"Risques_tech/SEVESO.gpkg"),
     "RADON": os.path.join(base_dir, r"Risques_tech/RADON/StatParCommune2022.shp"),
-    "Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_inorganiques_95centile.shp"),
+    # "Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_inorganiques_95centile.shp"),
     #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_organiques_95centile.shp"),
     "Pollution_sonore_route": os.path.join(base_dir, "Pollution_sonore/BRUIT_MROAD_2017_SHAPE_31370/BRUIT_MROAD_2017__LDEN.shp"),
+    "Pollution_sonore_agglo": os.path.join(base_dir, "Pollution_sonore/BRUIT_MROAD_AGGLO_2012_SHAPE_31370/BRUIT_AGGLO_ROAD_2012__LDEN.shp"),
     "Pollution_sonore_ferroviaire": os.path.join(base_dir, r"Pollution_sonore/BRUIT_MRAIL_2017_SHAPE_31370/BRUIT_MRAIL_2017__LDEN.shp"),
     "Pollution_sonore_airport": os.path.join(base_dir, "Pollution_sonore/BRUIT_AEROPORT_SHAPE_31370/BRUIT_AEROPORT_PEB.shp"),
-    #"axes_routier_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_ROAD_2012__LDEN.shp",
+
+    # "axe_routiers_agglo": os.path.join(base_dir, "Pollution_sonore/Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_ROAD_2012__LDEN.shp"),
     #"axes_ferro_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit des axes ferroviaires dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_RAIL_2012__LDEN.shp",
     #"bruits_industrie_agglo": r"C:/Users/Guill/OneDrive - UCL/University/Master2/LBIRE2234/Variables/Pollution_sonore/Bruit de l'industrie dans les grandes agglomérations wallonnes - Rapportage 2012 – Série/BRUIT_AGGLO_IND_2012__LDEN.shp"
 }
@@ -56,7 +60,8 @@ def load_shp(filepath):
     Returns:
     geopandas.GeoDataFrame: A GeoDataFrame with the loaded shapefile data.
     """
-    gdf = gpd.read_file(filepath)
+    gdf = gpd.read_file(filepath,engine="pyogrio")
+    print(f'{filepath} successfully loaded')
     gdf = gdf.to_crs(epsg=4326)
     return gdf
 
@@ -81,7 +86,7 @@ def sample_tif_value(tif_filepath, longitude, latitude):
             print(f"Sample: {sample}")
             # If it's a single float value, return it directly
             if isinstance(sample, float):
-                return f"Sampled Value: {sample}"
+                return f"Sampled Value for {tif_filepath}: {sample}"
             # Otherwise, attempt to extract the value from the array or list
             value = sample[0]
             
@@ -141,17 +146,18 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
     ).add_to(m)
 
     # GeoJSON layers
-    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021','Floods_25', "Pollution_sonore_route", "Pollution_sonore_ferroviaire"]  # List of layers to exclude
+    # excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021','Floods_25', "Pollution_sonore_route", "Pollution_sonore_ferroviaire", "wallon"]  # List of layers to exclude
+    excluded_layers = ['Organic_Pollution', 'Inorganic_Pollution', 'RADON', 'Floods_2021','Floods_25', "SEVESO", "wallon", 'Pollution_sonore_route', "Pollution_sonore_ferroviaire", "Pollution_sonore_agglo"]  # List of layers to exclude
     # Create a dictionnary with the color for each .shp layer
     layer_colors = {
     "Floods_25": "blue",
     "Floods_2021": "darkblue", 
     "SEVESO": "green",
     "Pollution_sonore_airport": "gray",
-    #"Organic_Pollution": "purple",
-    #"Inorganic_Pollution": "orange",
-    #"axes_routier_agglo": "darkred",
-    #"axes_ferro_agglo": "orange",
+    # "Organic_Pollution": "purple",
+    # "Inorganic_Pollution": "orange",
+    # "axes_routier_agglo": "darkred",
+    # "axes_ferro_agglo": "orange",
     #"bruits_industrie_agglo": "cadetblue"
     }
     for name, layer in shp_layers.items():
@@ -175,8 +181,10 @@ def create_map(latitude, longitude, shp_layers, zoom_start=15):
     legend_labels = {
     "Floods_25": "Inondations retour 25 ans",
     "Floods_2021": "Inondations de 2021",
-    "SEVESO": "SEVESO",
-    "Pollution_sonore_airport": "Bruit aéroports",
+    # "SEVESO": "SEVESO",
+    "Pollution_sonore_airport": "Pollution sonore aéroportuaire",
+    # "Pollution_sonore_route": "Pollution sonore routière",
+    # "axes_ferro_agglo": "Pollution sonore ferroviaire",
     }
 
     for layer_name, label in legend_labels.items():
@@ -197,6 +205,23 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
     analysis_results = []
     WHO_LIMITS = {'no2': 25, 'pm10': 15, 'pm2.5': 5}  # Define WHO limits for pollutants
 
+     # CHECK: Is the point inside Wallonia
+    wallonie_layer = shp_layers.get("wallon")
+    if wallonie_layer is not None:
+        match = check_shapefile_risk(wallonie_layer, longitude, latitude)
+        if match.empty:
+            return [{
+                'type': 'error',
+                'color': 'grey',
+                'message': "La localisation est en dehors de la Wallonie."
+            }]
+    else:
+        return [{
+            'type': 'error',
+            'color': 'grey',
+            'message': "Le fichier de délimitation de la Wallonie n'est pas disponible."
+        }]
+    
     # Floods analysis
     floods_layers = {'Floods_25': 'inondations avec une période de retour de 25 ans', 'Floods_2021': 'inondations de juillet 2021'}
     floods_intersects = []
@@ -246,24 +271,24 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
             radon_class = radon_match.iloc[0]['ClassRad_1']
             radon_color_map = {
                 'Class 0': 'green',
-                'Class 1a': 'lightgreen',
+                'Class 1a': 'yellowgreen',
                 'Class 1b': 'yellow',
                 'Class 2a': 'orange',
                 'Class 2b': 'red'
             }
             radon_color = radon_color_map.get(radon_class, 'grey')
             radon_detail = {
-                'Class 0': '<=1% >300 Bq/m3',
-                'Class 1a': '1-2% > 300 Bq/m3',
-                'Class 1b': '2-5% > 300 Bq/m3',
-                'Class 2a': '5-10% > 300 Bq/m3',
-                'Class 2b': '>10% > 300 Bq/m3'
+                'Class 0': '<=1%',
+                'Class 1a': '1-2%',
+                'Class 1b': '2-5%',
+                'Class 2a': '5-10%',
+                'Class 2b': '>10%'
             }.get(radon_class, 'No data')
             analysis_results.append({
                 'type': 'radon',
                 'color': radon_color,
-                'message': f"Risque radon : {radon_class} - {radon_detail}"
-            })
+                # 'message': f"Risque radon : {radon_class} - {radon_detail}"
+                'message': f"Risque radon : {radon_detail} de risque de dépassement de 300 Bq/m3"})
         else:
             analysis_results.append({
                 'type': 'radon',
@@ -296,100 +321,87 @@ def analyze_location(latitude, longitude, shp_filepaths, tif_filepaths):
                     # if value_str cannot be converted to float
                     print(f"Error converting {pollutant} value to float: {value_str}")
 
-    if inorganic_pollutants_exceeds:
-        inorganic_color = 'red'
-        inorganic_message = 'Seuil dépassé pour : ' + ', '.join(inorganic_pollutants_exceeds)
-    else:
-        inorganic_color = 'green'
-        inorganic_message = 'Aucun seuil de polluants inorganiques dépassé'
+        if inorganic_pollutants_exceeds:
+            inorganic_color = 'red'
+            inorganic_message = 'Seuil dépassé pour : ' + ', '.join(inorganic_pollutants_exceeds)
+        else:
+            inorganic_color = 'green'
+            inorganic_message = 'Aucun seuil de polluants inorganiques dépassé'
+
+        analysis_results.append({
+            'type': 'inorganic_pollutants',
+            'color': inorganic_color,
+            'message': inorganic_message,
+            'details': inorganic_pollutants_exceeds
+        })
+
+    # Unified Pollution Sonore Index
+    sonor_color_map = {
+        'moins de 55': (1, 'green'),
+        'de 55 à 59': (2, 'yellowgreen'),
+        'de 60 à 64': (3, 'yellow'),
+        'de 65 à 69': (4, 'orange'),
+        'de 70 à 74': (5, 'red'),
+        'plus de 75': (6, 'purple'),
+        "Zone D'": (2, 'yellowgreen'),
+        "Zone C'": (3, 'yellow'),
+        "Zone B'": (4, 'orange'),
+        "Zone A'": (5, 'red')
+    }
+
+    noise_sources = {
+        'Pollution_sonore_route': ('CLASSE', 'routière'),
+        'Pollution_sonore_agglo': ('CLASSE', 'en agglomération'),
+        'Pollution_sonore_ferroviaire': ('CLASSE', 'ferroviaire'),
+        'Pollution_sonore_airport': ('ZONAGE', 'aéroportuaire'),
+    }
+    airport_dB_map = {
+        "Zone A'": '70+',
+        "Zone B'": 'entre 65 et 69',
+        "Zone C'": 'entre 60 et 64',
+        "Zone D'": 'entre 55 et 59',
+    }
+
+    max_noise_score = 0
+    composite_color = 'green'
+    noise_messages = []
+
+    for layer_name, (field, label) in noise_sources.items():
+        layer = shp_layers.get(layer_name)
+        if layer is not None:
+            print(f"Analyzing {layer_name}: {field} {label} pollution...")
+            match = check_shapefile_risk(layer, longitude, latitude)
+            if not match.empty:
+                print(f"Match found in {layer_name} for location ({latitude}, {longitude})")
+            
+                value = match.iloc[0][field]
+                score, color = sonor_color_map.get(value, (0, 'grey'))
+                max_noise_score = max(max_noise_score, score)
+
+                if label == 'aéroportuaire':
+                    db_value = airport_dB_map.get(value, value)
+                    noise_messages.append(f"Niveau de pollution sonore {label} : {db_value} dB")
+                else:
+                    noise_messages.append(f"Niveau de pollution sonore {label} : {value} dB")
+            else:
+                noise_messages.append(f"Aucune pollution sonore {label} détectée.")
+                print(f"No match in {layer_name} for location ({latitude}, {longitude})")
+
+        else:
+            noise_messages.append(f"Données non disponibles pour le bruit {label}.")
+
+    # Determine final color
+    for key, (score, color) in sonor_color_map.items():
+        if score == max_noise_score:
+            composite_color = color
+            break
 
     analysis_results.append({
-        'type': 'inorganic_pollutants',
-        'color': inorganic_color,
-        'message': inorganic_message,
-        'details': inorganic_pollutants_exceeds
+        'type': 'Noise_pollution',
+        'color': composite_color,
+        'message': ' - '.join(noise_messages)
     })
 
-    # Pollution Sonore Route analysis
-    # Determine the color based on the classe
-    sonor_color = {
-        'moins de 55': 'lightgreen',
-        'de 55 à 59': 'green',
-        'de 60 à 64': 'yellow',
-        'de 65 à 69': 'orange',
-        'de 70 à 74': 'red',
-        'plus de 75': 'purple',
-    }
-    pollution_sonore_route_layer = shp_layers.get("Pollution_sonore_route")
-    if pollution_sonore_route_layer is not None:
-        sonore_route_match = check_shapefile_risk(pollution_sonore_route_layer, longitude, latitude)
-        if not sonore_route_match.empty:
-            classe_route = sonore_route_match.iloc[0]['CLASSE']
-            sonore_route_color = sonor_color.get(classe_route, 'grey')
-            sonore_route_message = f"Niveau de bruit routier en dB : {classe_route}"
-            analysis_results.append({
-                'type': 'pollution_sonore_route',
-                'color': sonore_route_color,
-                'message': sonore_route_message
-            })
-        else:
-            analysis_results.append({
-                'type': 'pollution_sonore_route',
-                'color': 'green',
-                'message': 'Il n\'a y pas de pollution sonore liée aux grands axes routiers pour cette localisation'
-            })
-
-    # Pollution Sonore Ferroviaire analysis
-    pollution_sonore_ferroviaire_layer = shp_layers.get("Pollution_sonore_ferroviaire")
-    if pollution_sonore_ferroviaire_layer is not None:
-        sonore_ferroviaire_match = check_shapefile_risk(pollution_sonore_ferroviaire_layer, longitude, latitude)
-        if not sonore_ferroviaire_match.empty:
-            classe_ferroviaire = sonore_ferroviaire_match.iloc[0]['CLASSE']
-            sonore_ferroviaire_color = sonor_color.get(classe_ferroviaire, 'grey')
-            sonore_ferroviaire_message = f"Niveau de bruit ferroviaire en dB : {classe_ferroviaire}"
-            analysis_results.append({
-                'type': 'pollution_sonore_ferroviaire',
-                'color': sonore_ferroviaire_color,
-                'message': sonore_ferroviaire_message
-            })
-        else:
-            analysis_results.append({
-                'type': 'pollution_sonore_ferroviaire',
-                'color': 'green',
-                'message': 'Il n\'a y pas de pollution sonore liée aux grand axes ferroviaires pour cette localisation'
-            })
-
-    # Pollution Sonore airport analysis
-    pollution_sonore_airport_layer = shp_layers.get("Pollution_sonore_airport")
-    airport_color = {
-        "Zone A'": 'red',
-        "Zone B'": 'orange',
-        "Zone C'": 'yellow',
-        "Zone D'": 'green',
-    }
-    if pollution_sonore_airport_layer is not None:
-        sonore_airport_match = check_shapefile_risk(pollution_sonore_airport_layer, longitude, latitude)
-        if not sonore_airport_match.empty:
-            classe_airport = sonore_airport_match.iloc[0]['ZONAGE']
-            sonore_airport_color = airport_color.get(classe_airport, 'grey')
-            airport_detail = {
-                "Zone A'": '70 dB',
-                "Zone B'": 'entre 70 et 65 dB',
-                "Zone C'": 'entre 65 et 60 dB',
-                "Zone D'": 'entre 60 et 55 dB',
-            }.get(classe_airport, 'No data')
-            sonore_airport_message = f"Niveau de bruit airport en dB : {classe_airport} - {airport_detail}"
-            analysis_results.append({
-                'type': 'pollution_sonore_airport',
-                'color': sonore_airport_color,
-                'message': sonore_airport_message
-            })
-        else:
-            analysis_results.append({
-                'type': 'pollution_sonore_airport',
-                'color': 'green',
-                'message': 'Il n\'a y pas de pollution sonore liée aux aéroports pour cette localisation'
-            })
 
     # atmospheric pollutants
     pollution_exceeds = 0
