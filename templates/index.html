@@ -97,12 +97,20 @@
        
 <!-- Dynamic analysis results -->
 {% for result in analysis_results %}
+{% if result['type'] == 'error' %}
+    <div class="alert alert-warning" style="margin-top: 20px; color: red;">
+      {{ result['message'] }}
+    </div>
+  {% else %}
 <div class="result-card">
     <div class="button-group" style="display: flex; align-items: center;">
-        <button class="{{ result['type'] }}-indicator" style="background-color: {{ result['color'] }};" onclick="toggleDetails('{{ result['type'] }}')">
-            {{ result['type'].capitalize() }} Risk Indicator
+        <button class="{{ result['type'] }}-indicator" 
+                style="background-color: {{ result['color'] }};" 
+                onclick="toggleDetails('{{ result['type'] }}')">
+            {{ result['type'].replace('_', ' ').capitalize() }} Index
         </button>
-        {% if result['type'] in ['Air_quality', 'seveso', 'radon', 'floods', 'inorganic_pollutants', 'pollution_sonore_route'] %}
+        {% if result['type'] in ['Air_quality', 'seveso', 'radon', 'floods', 'pollution_sonore_route', 'Noise_pollution'] %} 
+        <!-- 'inorganic_pollutants' -->
             <button class="btn btn-info" style="margin-left: 10px;" onclick="toggleLegend('{{ result['type'] }}')">Info</button>
         {% endif %}
     </div>
@@ -122,6 +130,17 @@
         <!-- Information Button Content -->
         {% if result['type'] == 'Air_quality' %}
             <div class="Air_quality-legend" style="display: none;">
+                <p><i>Source: irCELine</i></p>
+                <div class="color-legend" style="margin-top: 10px;">
+                    <h6>Légende des couleurs :</h6>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Aucun dépassement</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 1 dépassement</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 2-3 dépassements</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> 4 dépassements ou plus</li>
+                    </ul>
+                </div>
+
                 <h5>Valeurs limites proposées par l'OMS pour les polluants atmosphériques basées sur des valeurs moyennes annuelles :</h5>
                 <ul>
                     <li>NO2: 25 µg/m³</li>
@@ -132,34 +151,93 @@
                 <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
             </div>
         {% endif %}
+
         {% if result['type'] == 'seveso' %}
             <div class="seveso-legend" style="display: none;">
+                <p><i>Source: WalOnMap - SPW"</i></p>
+                <div class="color-legend" style="margin-top: 10px;">
+                    <h6>Légende des couleurs :</h6>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Hors zone SEVESO</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> Zone SEVESO</li>
+                    </ul>
+                </div>
+
                 <h5>Sites SEVESO :</h5>
                 <p>Les sites Seveso sont des zones où des incidents éventuels peuvent survenir, engendrant des conséquences possibles pour le personnel, les populations environnantes, les biens ou l'environnement. Les territoires sont exposés à divers risques naturels tels que la submersion marine, les ruissellements, les pluies diluviennes, l'érosion du littoral, les mouvements de terrain, etc.</p>
                 <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
             </div>
         {% endif %}
+
         {% if result['type'] == 'pollution_sonore_route' %}
-        <div class="pollution_sonore_route-legend" style="display: none;">
-            <h5>Risques liées à la pollution sonore :</h5>
-            <p>Le bruit peut perturber les activités quotidiennes et avoir des répercussions sur la santé, se manifestant par des problèmes auditifs tels que les acouphènes, une qualité de sommeil altérée, des événements cardiovasculaires, des déficits cognitifs et d'autres conséquences métaboliques touchant, par exemple, le système immunitaire, endocrinien, ou la santé mentale. </p>
-            <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
-        </div>
-    {% endif %}
+            <div class="pollution_sonore_route-legend" style="display: none;">
+                <h5>Risques liées à la pollution sonore :</h5>
+                <p>Le bruit peut perturber les activités quotidiennes et avoir des répercussions sur la santé, se manifestant par des problèmes auditifs tels que les acouphènes, une qualité de sommeil altérée, des événements cardiovasculaires, des déficits cognitifs et d'autres conséquences métaboliques touchant, par exemple, le système immunitaire, endocrinien, ou la santé mentale. </p>
+                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
+            </div>
+        {% endif %}
+
+        {% if result['type'] == 'Noise_pollution' %}
+            <div class="Noise_pollution-legend" style="display: none;">
+                <p><i>Source: "WalOnMap: Cartographie du bruit en WalLonie"</i></p>
+
+                <div class="color-legend" style="margin-top: 10px;">
+                    <h6>Légende des couleurs :</h6>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Moins de 55 dB</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellowgreen;margin-right:5px;"></span> 55 à 59 dB</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 60 à 64 dB</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 65 à 69 dB</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> 70 à 74 dB</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:purple;margin-right:5px;"></span> Plus de 75 dB</li>
+                    </ul>
+                </div>
+
+                <h5>Risques liés à la pollution sonore :</h5>
+                <p>Le bruit peut perturber les activités quotidiennes et avoir des répercussions sur la santé, se manifestant par des problèmes auditifs, une qualité de sommeil altérée, des troubles cardiovasculaires, cognitifs et mentaux.</p>
+                <p>Ce score sonore regroupe les expositions aux sources suivantes : routière, ferroviaire et aéroportuaire.</p>
+                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé</em>. <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
+            </div>
+        {% endif %}
+
+
         {% if result['type'] == 'radon' %}
             <div class="radon-legend" style="display: none;">
+                <p><i>Source: Arcgis database from AFCN (Agence Fédérale de Controle Nucléaire)</i></p>
+                <div class="color-legend" style="margin-top: 10px;">
+                    <h6>Légende des couleurs :</h6>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> ≤1% </li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellowgreen;margin-right:5px;"></span> 1-2%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 2-5%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 5-10%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> >10%</li>
+                    </ul>
+                </div>
+
                 <h5>Risques radon:</h5>
                 <p>Le radon, considéré comme un agent carcinogène, constitue la deuxième cause de cancer du poumon après le tabagisme. En fonction des données scientifiques les plus récentes, l'OMS propose un niveau de référence de 100 Bq/m3 afin de minimiser les risques pour la santé liés à l'exposition au radon à l'intérieur des habitations. Cependant, si ce niveau ne peut pas être atteint dans les conditions spécifiques à chaque pays, le niveau de référence choisi ne devrait pas dépasser 300 Bq/m3.</p>
                 <p>Source : Angell, W. J., Zeeb, H., & Shannon, F. (2009). <em>Handbook on Indoor Radon : A Public Health Perspective</em>. WHO Library Cataloguing-in-Publication Data. <a href="https://iris.who.int/bitstream/handle/10665/44149/9789241547673_eng.pdf;jsessionid=D026AA0F9089BF3A94F8CC90D9B53979?sequence=1">Link to source</a></p>
             </div>
         {% endif %}
+
         {% if result['type'] == 'floods' %}
             <div class="floods-legend" style="display: none;">
+                <p><i>Source: WalOnMap:"Cartographie de l'aléa d'inondation"</i></p>
+                <div class="color-legend" style="margin-top: 10px;">
+                    <h6>Légende des couleurs :</h6>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Hors zone d’inondation</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> Zone à risque d’inondation</li>
+                    </ul>
+                </div>
+
                 <h5>Risques des inondations:</h5>
                 <p>En plus des éventuels décès, les inondations peuvent entraîner des conséquences telles que des infections gastro-intestinales, cutanées et des infections des voies respiratoires supérieures, provoquées par le développement de moisissures consécutif aux inondations. Elles peuvent également être à l'origine de troubles tels que le stress post-traumatique et de troubles dépressifs majeurs [1]. En Belgique, les Services d'Analyse des Milieux Intérieurs, tels que le SAMI en Wallonie ou la Cellule Régionale d'Intervention en Pollution Intérieure (CRIPI) à Bruxelles, sont disponibles. Les médecins généralistes peuvent faire appel à ces organismes lorsqu'ils soupçonnent que la santé du patient pourrait être liée à des conditions dans son domicile. Des experts se rendent ensuite chez le patient pour effectuer une analyse approfondie de son logement et procéder à des prélèvements.</p>
                 <p>Source: Carias M. E., Johnston D. W., Knott R., and al (2022). <a href="https://doi.org/10.1002/hec.4566">Flood disasters and health among the urban poor. Health Economics, 31(9), 2072-2089.</a></p>
             </div>
         {% endif %}
+
         {% if result['type'] == 'inorganic_pollutants' %}
             <div class="inorganic_pollutants-legend" style="display: none;">
                 <h5>Risques des polluants inorganiques:</h5>
@@ -185,11 +263,12 @@
             </div>
         {% endif %}
     </div>
+    {% endif %}
 {% endfor %}
 {{ map_html|safe }}
 
 <!-- Heading before the iframe -->
-<div class="container">
+<!-- <div class="container">
     <h2 class="my-4">Cartes IRCeline des polluants atmosphériques en temps réels</h2>
     <p class="mt-3">Source : <a href="https://www.irceline.be/fr">Cellule Interrégionale de l'Environnement (CELINE)</a></p>
 
@@ -207,7 +286,7 @@
 
     <h4>Black Carbon (BC) - 24h Mean</h4>
     <iframe height="400" width="100%" src="https://geo.irceline.be/www/bc_24hmean_FR.html"></iframe>
-</div>
+</div> -->
 
 <footer>
     &copy; 2023 PRISM Analyzer. All rights reserved by ELIE UCLouvain.
