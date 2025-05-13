@@ -33,7 +33,7 @@ shp_filepaths = {
     # "Inorganic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_inorganiques_95centile.shp"),
     #"Organic_Pollution": os.path.join(base_dir, r"Sols_exterieurs/Sol_pol_organiques_95centile/Sol_pol_organiques_95centile.shp"),
     "Pollution_sonore_route": os.path.join(base_dir, "Pollution_sonore/BRUIT_MROAD_2017_SHAPE_31370/BRUIT_MROAD_2017__LDEN.shp"),
-    "Pollution_sonore_agglo": os.path.join(base_dir, "Pollution_sonore/Bruit des axes routiers dans les grandes agglomérations wallonnes - Rapportage 2012 - Série/BRUIT_AGGLO_ROAD_2012__LDEN.shp"),
+    "Pollution_sonore_agglo": os.path.join(base_dir, "Pollution_sonore/BRUIT_MROAD_AGGLO_2012_SHAPE_31370/BRUIT_AGGLO_ROAD_2012__LDEN.shp"),
     "Pollution_sonore_ferroviaire": os.path.join(base_dir, r"Pollution_sonore/BRUIT_MRAIL_2017_SHAPE_31370/BRUIT_MRAIL_2017__LDEN.shp"),
     "Pollution_sonore_airport": os.path.join(base_dir, "Pollution_sonore/BRUIT_AEROPORT_SHAPE_31370/BRUIT_AEROPORT_PEB.shp"),
 
