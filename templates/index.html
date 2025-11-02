@@ -108,6 +108,7 @@
                 style="background-color: {{ result['color'] }};" 
                 onclick="toggleDetails('{{ result['type'] }}')">
             {{ result['type'].replace('_', ' ').capitalize() }} Index
+            </button>
         </button>
         {% if result['type'] in ['Air_quality', 'seveso', 'radon', 'floods', 'pollution_sonore_route', 'Noise_pollution'] %} 
         <!-- 'inorganic_pollutants' -->
@@ -130,26 +131,61 @@
         <!-- Information Button Content -->
         {% if result['type'] == 'Air_quality' %}
             <div class="Air_quality-legend" style="display: none;">
-                <p><i>Source: irCELine</i></p>
-                <div class="color-legend" style="margin-top: 10px;">
-                    <h6>Légende des couleurs :</h6>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Aucun dépassement</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 1 dépassement</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 2-3 dépassements</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> 4 dépassements ou plus</li>
+                <ul class="nav nav-pills" id="airTabs{{ loop.index0 }}" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link active" id="air-health-tab{{ loop.index0 }}" data-toggle="tab" href="#air-health{{ loop.index0 }}" role="tab">Health Effects</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="air-action-tab{{ loop.index0 }}" data-toggle="tab" href="#air-action{{ loop.index0 }}" role="tab">Action</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="air-legend-tab{{ loop.index0 }}" data-toggle="tab" href="#air-legend-pane{{ loop.index0 }}" role="tab">Legend</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content pt-3" id="airTabsContent{{ loop.index0 }}">
+                    <div class="tab-pane fade show active" id="air-health{{ loop.index0 }}" role="tabpanel">
+                    <ul>
+                        <li>In children: premature death, low birth weight, neurodevelopmental disorders, cancer, metabolic diseases…</li>
+                        <li>Cerebrovascular accidents and heart disease</li>
+                        <li>Lung cancer; acute and chronic respiratory diseases… ⁶</li>
                     </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="air-action{{ loop.index0 }}" role="tabpanel">
+                    <p>Policies to reduce air pollution in ⁶:</p>
+                    <ul>
+                        <li>industry, energy, transport, urban planning, power generation,</li>
+                        <li>municipal & agricultural waste management, health-care activities…</li>
+                    </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="air-legend-pane{{ loop.index0 }}" role="tabpanel">
+                    <p><i>Source: irCELine</i></p>
+                    <h6>Color legend</h6>
+                    <ul style="list-style:none; padding:0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> No exceedance</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 1 exceedance</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 2–3 exceedances</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> ≥4 exceedances</li>
+                    </ul>
+                    <h6>WHO annual guideline values</h6>
+                    <ul>
+                        <li>NO₂: 25 µg/m³</li>
+                        <li>PM₁₀: 15 µg/m³</li>
+                        <li>PM₂.₅: 5 µg/m³</li>
+                    </ul>
+                    </div>
                 </div>
 
-                <h5>Valeurs limites proposées par l'OMS pour les polluants atmosphériques basées sur des valeurs moyennes annuelles :</h5>
-                <ul>
-                    <li>NO2: 25 µg/m³</li>
-                    <li>PM10: 15 µg/m³</li>
-                    <li>PM2.5: 5 µg/m³</li>
-                </ul>
-                <p>La pollution de l'air est principalement associée à des maladies cardio-respiratoires, cérébro-vasculaires et à certains types de cancers.</p>
-                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé. État des lieux des connaissances et recommandations pour asseoir des politiques publiques pour un habitat sain</em>. Dans HAL (Le Centre pour la Communication Scientifique Directe). <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
-            </div>
+                <div class="references mt-3" style="font-size:0.9em;">
+                    <h6>References</h6>
+                    <ol>
+                    <li><a href="https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health" target="_blank">⁶ WHO – Ambient air pollution</a></li>
+                    </ol>
+                </div>
+                </div>
+
         {% endif %}
 
         {% if result['type'] == 'seveso' %}
@@ -179,63 +215,179 @@
 
         {% if result['type'] == 'Noise_pollution' %}
             <div class="Noise_pollution-legend" style="display: none;">
-                <p><i>Source: "WalOnMap: Cartographie du bruit en WalLonie"</i></p>
+                <ul class="nav nav-pills" id="noiseTabs{{ loop.index0 }}" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link active" id="noise-health-tab{{ loop.index0 }}" data-toggle="tab" href="#noise-health{{ loop.index0 }}" role="tab">Health Effects</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="noise-action-tab{{ loop.index0 }}" data-toggle="tab" href="#noise-action{{ loop.index0 }}" role="tab">Action</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="noise-legend-tab{{ loop.index0 }}" data-toggle="tab" href="#noise-legend-pane{{ loop.index0 }}" role="tab">Legend</a>
+                    </li>
+                </ul>
 
-                <div class="color-legend" style="margin-top: 10px;">
-                    <h6>Légende des couleurs :</h6>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Moins de 55 dB</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellowgreen;margin-right:5px;"></span> 55 à 59 dB</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 60 à 64 dB</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 65 à 69 dB</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> 70 à 74 dB</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:purple;margin-right:5px;"></span> Plus de 75 dB</li>
+                <div class="tab-content pt-3" id="noiseTabsContent{{ loop.index0 }}">
+                    <div class="tab-pane fade show active" id="noise-health{{ loop.index0 }}" role="tabpanel">
+                    <ul>
+                        <li>Annoyance (stress reaction: disturbance, dissatisfaction, distress, irritation, nuisance)</li>
+                        <li>Sleep disturbance</li>
+                        <li>Cardiovascular and metabolic effects</li>
+                        <li>Cognitive development in children… ⁷</li>
                     </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="noise-action{{ loop.index0 }}" role="tabpanel">
+                    <p>Policies to reduce noise ⁸, for example:</p>
+                    <ul>
+                        <li>Low-emission zones</li>
+                        <li>Noise radars</li>
+                        <li>Quiet areas…</li>
+                    </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="noise-legend-pane{{ loop.index0 }}" role="tabpanel">
+                    <p><i>Source: WalOnMap – Noise mapping in Wallonia</i></p>
+                    <h6>Color legend</h6>
+                    <ul style="list-style:none; padding:0;">
+                        <li><span style="background:green;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> &lt;55 dB</li>
+                        <li><span style="background:yellowgreen;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> 55–59 dB</li>
+                        <li><span style="background:yellow;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> 60–64 dB</li>
+                        <li><span style="background:orange;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> 65–69 dB</li>
+                        <li><span style="background:red;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> 70–74 dB</li>
+                        <li><span style="background:purple;width:12px;height:12px;display:inline-block;margin-right:5px;"></span> &gt;75 dB</li>
+                    </ul>
+                    <p>This score combines exposures from road, rail, and airport sources.</p>
+                    </div>
                 </div>
 
-                <h5>Risques liés à la pollution sonore :</h5>
-                <p>Le bruit peut perturber les activités quotidiennes et avoir des répercussions sur la santé, se manifestant par des problèmes auditifs, une qualité de sommeil altérée, des troubles cardiovasculaires, cognitifs et mentaux.</p>
-                <p>Ce score sonore regroupe les expositions aux sources suivantes : routière, ferroviaire et aéroportuaire.</p>
-                <p>Source : Febvrel D., Squinazi F., Bex and al. (2019). <em>Facteurs contribuant à un habitat favorable à la santé</em>. <a href="https://hal.ehesp.fr/hal-02190365">Link to source</a></p>
-            </div>
+                <div class="references mt-3" style="font-size:0.9em;">
+                    <h6>References</h6>
+                    <ol>
+                    <li><a href="https://data.europa.eu/doi/10.2800/686249" target="_blank">⁷ EEA – Environmental noise in Europe, 2020</a></li>
+                    <li><a href="https://www.canopea.be/le-bruit-ce-son-devenu-nuisible-pour-la-sante/" target="_blank">⁸ Canopea (2021)</a></li>
+                    </ol>
+                </div>
+                </div>  
         {% endif %}
 
 
         {% if result['type'] == 'radon' %}
             <div class="radon-legend" style="display: none;">
-                <p><i>Source: Arcgis database from AFCN (Agence Fédérale de Controle Nucléaire)</i></p>
-                <div class="color-legend" style="margin-top: 10px;">
-                    <h6>Légende des couleurs :</h6>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> ≤1% </li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellowgreen;margin-right:5px;"></span> 1-2%</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 2-5%</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 5-10%</li>
+                <ul class="nav nav-pills" id="radonTabs{{ loop.index0 }}" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link active" id="radon-health-tab{{ loop.index0 }}" data-toggle="tab" href="#radon-health{{ loop.index0 }}" role="tab">Health Effects</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="radon-action-tab{{ loop.index0 }}" data-toggle="tab" href="#radon-action{{ loop.index0 }}" role="tab">Action</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="radon-legend-tab{{ loop.index0 }}" data-toggle="tab" href="#radon-legend-pane{{ loop.index0 }}" role="tab">Legend</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content pt-3" id="radonTabsContent{{ loop.index0 }}">
+                    <div class="tab-pane fade show active" id="radon-health{{ loop.index0 }}" role="tabpanel">
+                    <p>Second cause of lung cancer (after smoking) in Belgium. ¹</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="radon-action{{ loop.index0 }}" role="tabpanel">
+                    <ul>
+                        <li>Measurement campaigns (<a href="https://www.actionradon.be" target="_blank">www.actionradon.be</a>)</li>
+                        <li>Airtight barrier against radon</li>
+                        <li>Evacuate radon-laden air (natural & mechanical ventilation) ¹</li>
+                    </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="radon-legend-pane{{ loop.index0 }}" role="tabpanel">
+                    <p><i>Source: AFCN / FANC (ArcGIS database)</i></p>
+                    <h6>Color legend</h6>
+                    <ul style="list-style:none; padding:0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> ≤1%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellowgreen;margin-right:5px;"></span> 1–2%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:yellow;margin-right:5px;"></span> 2–5%</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:orange;margin-right:5px;"></span> 5–10%</li>
                         <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> >10%</li>
                     </ul>
+                    </div>
                 </div>
 
-                <h5>Risques radon:</h5>
-                <p>Le radon, considéré comme un agent carcinogène, constitue la deuxième cause de cancer du poumon après le tabagisme. En fonction des données scientifiques les plus récentes, l'OMS propose un niveau de référence de 100 Bq/m3 afin de minimiser les risques pour la santé liés à l'exposition au radon à l'intérieur des habitations. Cependant, si ce niveau ne peut pas être atteint dans les conditions spécifiques à chaque pays, le niveau de référence choisi ne devrait pas dépasser 300 Bq/m3.</p>
-                <p>Source : Angell, W. J., Zeeb, H., & Shannon, F. (2009). <em>Handbook on Indoor Radon : A Public Health Perspective</em>. WHO Library Cataloguing-in-Publication Data. <a href="https://iris.who.int/bitstream/handle/10665/44149/9789241547673_eng.pdf;jsessionid=D026AA0F9089BF3A94F8CC90D9B53979?sequence=1">Link to source</a></p>
-            </div>
+                <div class="references mt-3" style="font-size:0.9em;">
+                    <h6>References</h6>
+                    <ol>
+                    <li><a href="https://fanc.fgov.be/nl/dossiers/radon-en-radioactiviteit-uw-huis/radon/wat-het-risico-voor-uw-gezondheid" target="_blank">¹ FANC (2020)</a></li>
+                    </ol>
+                </div>
+                </div>
         {% endif %}
 
         {% if result['type'] == 'floods' %}
             <div class="floods-legend" style="display: none;">
-                <p><i>Source: WalOnMap:"Cartographie de l'aléa d'inondation"</i></p>
-                <div class="color-legend" style="margin-top: 10px;">
-                    <h6>Légende des couleurs :</h6>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Hors zone d’inondation</li>
-                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> Zone à risque d’inondation</li>
+                <ul class="nav nav-pills" id="floodTabs{{ loop.index0 }}" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link active" id="flood-health-tab{{ loop.index0 }}" data-toggle="tab" href="#flood-health{{ loop.index0 }}" role="tab">Health Effects</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="flood-action-tab{{ loop.index0 }}" data-toggle="tab" href="#flood-action{{ loop.index0 }}" role="tab">Action</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="flood-legend-tab{{ loop.index0 }}" data-toggle="tab" href="#flood-legend-pane{{ loop.index0 }}" role="tab">Legend</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content pt-3" id="floodTabsContent{{ loop.index0 }}">
+                    <div class="tab-pane fade show active" id="flood-health{{ loop.index0 }}" role="tabpanel">
+                    <p><b>Living in flood-prone areas ²:</b></p>
+                    <ul>
+                        <li>Moisture → mould growth (airborne allergens) → allergic diseases (rhinitis, conjunctivitis, asthma, hypersensitivity pneumonitis, skin reactions…)</li>
+                        <li>Increased respiratory infections ³</li>
                     </ul>
+                    <p><b>During flooding ⁴:</b></p>
+                    <ul>
+                        <li>Infectious diseases, deaths, soft skin lesions, accidents (intoxication…)</li>
+                        <li>Impact on mental health; deterioration of chronic diseases</li>
+                        <li>Difficulty accessing primary care</li>
+                    </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="flood-action{{ loop.index0 }}" role="tabpanel">
+                    <p><b>Living in flood-prone areas ⁵:</b></p>
+                    <ul>
+                        <li>Ventilation (natural & mechanical)</li>
+                        <li>Humidity extractor – avoid excessive indoor humidity</li>
+                        <li>Maintain indoor temperature (18–20 °C)</li>
+                        <li>Clean mould regularly</li>
+                        <li>GP can contact “green ambulance” (CRIPI, SAMI)</li>
+                    </ul>
+                    <p><b>During flooding ⁴:</b></p>
+                    <ul>
+                        <li>Hand hygiene</li>
+                        <li>Drink safe water and eat safe food</li>
+                        <li>Raise awareness with healthcare providers (flood risk, verify vaccination status…)</li>
+                        <li>Protect yourself when cleaning</li>
+                    </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="flood-legend-pane{{ loop.index0 }}" role="tabpanel">
+                    <p><i>Source: WalOnMap – Cartographie de l’aléa d’inondation</i></p>
+                    <h6>Color legend</h6>
+                    <ul style="list-style:none; padding:0;">
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:green;margin-right:5px;"></span> Outside flood zone</li>
+                        <li><span style="display:inline-block;width:12px;height:12px;background-color:red;margin-right:5px;"></span> Flood risk area</li>
+                    </ul>
+                    </div>
                 </div>
 
-                <h5>Risques des inondations:</h5>
-                <p>En plus des éventuels décès, les inondations peuvent entraîner des conséquences telles que des infections gastro-intestinales, cutanées et des infections des voies respiratoires supérieures, provoquées par le développement de moisissures consécutif aux inondations. Elles peuvent également être à l'origine de troubles tels que le stress post-traumatique et de troubles dépressifs majeurs [1]. En Belgique, les Services d'Analyse des Milieux Intérieurs, tels que le SAMI en Wallonie ou la Cellule Régionale d'Intervention en Pollution Intérieure (CRIPI) à Bruxelles, sont disponibles. Les médecins généralistes peuvent faire appel à ces organismes lorsqu'ils soupçonnent que la santé du patient pourrait être liée à des conditions dans son domicile. Des experts se rendent ensuite chez le patient pour effectuer une analyse approfondie de son logement et procéder à des prélèvements.</p>
-                <p>Source: Carias M. E., Johnston D. W., Knott R., and al (2022). <a href="https://doi.org/10.1002/hec.4566">Flood disasters and health among the urban poor. Health Economics, 31(9), 2072-2089.</a></p>
-            </div>
+                <div class="references mt-3" style="font-size:0.9em;">
+                    <h6>References</h6>
+                    <ol>
+                    <li><a href="https://www.sciensano.be/en/health-topics/mould" target="_blank">² Sciensano – Mould</a></li>
+                    <li><a href="https://www.eea.europa.eu/en/analysis/publications/beating-chronic-respiratory-disease/indoor-environment-mould-and-dampness" target="_blank">³ EEA (2024)</a></li>
+                    <li><a href="https://doi.org/10.1002/hec.4566" target="_blank">⁴ Cornelissen et al., 2021</a></li>
+                    <li><a href="https://iris.who.int/handle/10665/164348" target="_blank">⁵ WHO: Dampness and mould (2009)</a></li>
+                    </ol>
+                </div>
+                </div>
         {% endif %}
 
         {% if result['type'] == 'inorganic_pollutants' %}
